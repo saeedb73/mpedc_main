@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'src/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+
+    <link rel="icon" href="{% static 'project/main_icon.png' %}">
+
+    <title>خانه</title>
+</head>
+
+<body>
+
+
+{# NAVBAR SECTION #}
+<nav class="navbar navbar-dark bg-info navbar_custom navbar-expand-md" style="background-color: #082d12 !important;">
+    <div class="container-fluid px-4">
+
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fa fa-user-circle-o fa-lg" aria-hidden="true"></i>
+            {% if user.first_name %}
+                {{ user.first_name }}
+                {% if user.last_name %}
+                    {{ user.last_name }}
+                {% endif %}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-contents">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-contents">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item align-self-start align-self-md-center mr-md-0 mr-1 active">
+                    <a class="nav-link" href="{% url 'home' %}">خانه</a>
+                </li>
+                <li class="nav-item align-self-start align-self-md-center mr-md-0 mr-1">
+                    <a class="nav-link" href="{% url 'loginuser' %}admin" target="_blank">مدیر</a>
+                </li>
+                <li class="nav-item align-self-start align-self-md-center mr-md-0 mr-1">
+                    <a class="nav-link" href="{% url 'logoutuser' %}" data-toggle="modal" data-target="#logout-modal"><button class="btn btn-outline-light d-inline">خروج</button></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+{# WELCOME ALERT #}
+<div class="container">
+    <div class="row justify-content-center pt-3">
+        <div class="col-10 col-sm-8 col-md-6">
+            <div id="welcome_alert" class="alert alert-success justify-content-start" role="alert" dir="rtl">
+                <div class="d-flex">خوش آمدید. <a class="close d-inline d-flex mr-auto ml-0" data-dismiss="alert">&times;</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{# CARDS ABOVE TABLE #}
+<div class="container-fluid px-5 mx-0">
+    <div class="row mt-5" dir="rtl">
+        <!-- ALL PROJECTS CARD -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-info text-white shadow h-100" style="border-radius: 0px !important;">
+                <div class="card-body mt-3">
+                    <h4 class="text-center"><i class="fa fa-info-circle fa-lg"></i> کل پروژه‌ها</h4>
+                </div>
+                <div class="card-footer">
+                    <h3 class="text-center">{{ number_of_projects }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- NORMAL PROJECTS CARD -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-success text-white shadow h-100" style="border-radius: 0px !important;">
+                <div class="card-body mt-3">
+                    <h4 class="text-center"><i class="fa fa-check-circle fa-lg"></i> پروژه‌های نرمال</h4>
+                </div>
+                <div class="card-footer">
+                    <h3 class="text-center">{{ number_of_normal_projects }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- WARNER PROJECTS CARD -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-warning text-white shadow h-100" style="border-radius: 0px !important;">
+                <div class="card-body mt-3">
+                    <h4 class="text-center"><i class="fa fa-exclamation-triangle fa-lg"></i> پروژه‌های مشکوک</h4>
+                </div>
+                <div class="card-footer">
+                    <h3 class="text-center">{{ number_of_warner_projects }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- DANGEROUS PROJECTS CARD -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-danger text-white shadow h-100" style="border-radius: 0px !important;">
+                <div class="card-body mt-3">
+                    <h4 class="text-center"><i class="fa fa-times-circle fa-lg"></i> پروژه‌های خطرناک</h4>
+                </div>
+                <div class="card-footer">
+                    <h3 class="text-center">{{ number_of_dangerous_projects }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{# Table #}
+<div class="container-fluid px-5 my-5" dir="ltr">
+    <div class="card shadow">
+        <div class="card-header">
+            <h3 class="text-lead text-right py-3" style="color: #082d12 !important;">نمایش پروژه‌ها</h3>
+        </div>
+
+        <div class="card-body px-3">
+            <table id="dtBasicExample" class="table table-bordered table-responsive-sm" dir="rtl">
+                <thead>
+                <tr class="text-center">
+                    <th width="40" class="th-sm">ردیف</th>
+                    <th class="th-sm">عنوان</th>
+                    <th class="th-sm">پیمانکار</th>
+                    <th class="th-sm">محل اجرای پروژه</th>
+                    <th class="th-sm">درصد پیشرفت فیزیکی</th>
+                    <th class="th-sm">درصد پیشرفت مالی</th>
+                    <th class="th-sm">جزئیات</th>
+                </tr>
+                </thead>
+                <tbody class="text-center">
+                {% if number_of_projects == 0 %}
+                    <tr class="text-muted">
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                {% else %}
+                        {% for project in projects %}
+                            <tr class="text-muted">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ project.title }}</td>
+                                <td>{{ project.contractor }}</td>
+                                <td>{{ project.place_of_project }}</td>
+                                <td>{{ project.physical_progress }}</td>
+                                <td>{{ project.financial_progress }}</td>
+                                {% if project.check_variable <= 1 %}
+                                    <td class="bg-success"><a href="{% url 'project_detail' project.id %}"><button class="btn btn-outline-light"><i class="fa fa-arrow-circle-left"></i></button></a></td>
+                                {% elif project.check_variable <= 1.1 %}
+                                    <td class="bg-warning"><a href="{% url 'project_detail' project.id %}"><button class="btn btn-outline-light"><i class="fa fa-arrow-circle-left"></i></button></a></td>
+                                {% else %}
+                                    <td class="bg-danger"><a href="{% url 'project_detail' project.id %}"><button class="btn btn-outline-light"><i class="fa fa-arrow-circle-left"></i></button></a></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                {% endif %}
+                </tbody>
+                <tfoot>
+                <tr class="text-center">
+                    <th width="40" class="th-sm">ردیف</th>
+                    <th class="th-sm">عنوان</th>
+                    <th class="th-sm">پیمانکار</th>
+                    <th class="th-sm">محل اجرای پروژه</th>
+                    <th class="th-sm">درصد پیشرفت فیزیکی</th>
+                    <th class="th-sm">درصد پیشرفت مالی</th>
+                    <th class="th-sm">جزئیات</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div><br><br>
+
+
+{# FOOTER SECTION #}
+<section id="footer" class="bg-dark" style="background-color: #082d12 !important;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col text-center">
+                <div class="py-2 text-white">
+                    <p class="mt-3">ستاد شرکت توزیع نیروی برق استان مرکزی</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+{# LOGOUT MODAL SECTION #}
+<div class="modal fade" id="logout-modal">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logout-modalLabel">خروج کاربر</h5>
+                <button class="close mr-auto ml-0 px-2 align-middle" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-right">آیا از خروج اطمینان دارید؟</p>
+            </div>
+            <div class="modal-footer">
+                <form method='POST' action="{% url 'logoutuser' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">خروج</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'src/js/jquery.min.js' %}"></script>
+<script src="{% static 'src/js/tether.min.js' %}"></script>
+<script src="{% static 'src/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'src/js/navbar-fixed.js' %}"></script>
+
+<script src="{% static 'src/js/table/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'src/js/table/dataTables.bootstrap4.min.js' %}"></script>
+
+
+
+<script>
+    $("#welcome_alert").fadeTo(2000, 5000).slideUp(500, function(){
+        $("#welcome_alert").slideUp(500);
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample').DataTable();
+        $('.dataTables_length').addClass('bs-select');
+    });
+</script>
+
+
+</body>
+</html>
+

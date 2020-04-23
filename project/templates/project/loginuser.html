@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'src/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+
+    <link rel="icon" href="{% static 'project/main_icon.png' %}">
+
+    <title>ورود</title>
+</head>
+
+<body>
+
+
+{% if user.is_authenticated %}
+    <meta http-equiv="Refresh" content="0; url= {% url 'home' %}">
+{% else %}
+    <div class="container">
+
+        <div class="row d-flex justify-content-center mt-5 pt-5">
+            <div class="col-10 col-sm-8">
+                <div class="card">
+                    <img class="card-img-top px-4" src="{% static 'project/home_image.png' %}">
+
+                    <div class="card-body text-center">
+                        <hr><br>
+                        <p class="card-text lead">به قسمت نظارت بر اجرای طرح‌های مهندسی خوش آمدید. با استفاده از دکمه زیر به پنل خود وارد شوید.</p>
+                        <br><hr>
+                        <a class="btn btn-success btn-block btn-lg mx-auto text-white" data-toggle="modal" data-target="#login-modal">ورود</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# LOGIN MODAL #}
+        <div class="modal fade" id="login-modal">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="login-modalLabel">ورود کاربر</h5>
+                        <button class="close mr-auto ml-0 px-2 align-middle" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        {% if error %}
+                            <div id="user_info_wrong_alert" class="alert alert-danger justify-content-start" role="alert" dir="rtl">
+                                <div class="d-flex text-right">{{ error }} <i class="close d-inline d-flex mr-auto ml-0" data-dismiss="alert">&times;</i></div>
+                            </div>
+                        {% endif %}
+                        <form method='POST' action="">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="username" class="text-right d-block mt-3">نام کاربری</label>
+                                <input id="username" dir="ltr" type="text" placeholder="" name="username" class="form-control text-left">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="text-right d-block">گذر واژه</label>
+                                <input id="password" dir="ltr" type="password" placeholder="" name="password" class="form-control text-left mb-4">
+                            </div>
+                            <button type="submit" class="btn btn-outline-success btn-block mt-4">ورود</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
+<script src="{% static 'src/js/jquery.min.js' %}"></script>
+<script src="{% static 'src/js/tether.min.js' %}"></script>
+<script src="{% static 'src/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'src/js/navbar-fixed.js' %}"></script>
+
+{% if error %}
+    <script type="text/javascript">
+        $(window).on('load', function(){
+            $('#login-modal').modal('show');
+        });
+
+        $("#user_info_wrong_alert").fadeTo(2000, 8000).slideUp(500, function(){
+            $("#user_info_wrong_alert").slideUp(100);
+        });
+    </script>
+{% endif %}
+
+</body>
+</html>
+
+
+
+
+

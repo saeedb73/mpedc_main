@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'src/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+
+    <link rel="icon" href="{% static 'project/main_icon.png' %}">
+
+    <title>جزئیات پروژه</title>
+</head>
+
+<body>
+
+{# NAVBAR SECTION #}
+<nav class="navbar navbar-dark bg-info navbar_custom navbar-expand-md" style="background-color: #082d12 !important;">
+    <div class="container-fluid px-4">
+
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fa fa-user-circle-o fa-lg" aria-hidden="true"></i>
+            {% if user.first_name %}
+                {{ user.first_name }}
+                {% if user.last_name %}
+                    {{ user.last_name }}
+                {% endif %}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-contents">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-contents">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item align-self-start align-self-md-center mr-md-0 mr-1">
+                    <a class="nav-link" href="{% url 'home' %}">خانه</a>
+                </li>
+                <li class="nav-item align-self-start align-self-md-center mr-md-0 mr-1">
+                    <a class="nav-link" href="{% url 'loginuser' %}admin" target="_blank">مدیر</a>
+                </li>
+                <li class="nav-item align-self-start align-self-md-center mr-md-0 mr-1">
+                    <a class="nav-link" href="{% url 'logoutuser' %}" data-toggle="modal" data-target="#logout-modal"><button class="btn btn-outline-light d-inline">خروج</button></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+{# CONTENT SECTION #}
+<div class="container-fluid px-5 py-5 bg-light" style="min-height: 579px;">
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs justify-content-center" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="details_tab" data-toggle="tab" href="#details_body" role="tab" aria-controls="#details_body" aria-selected="true">جزئیات پروژه</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="reports_tab" data-toggle="tab" href="#reports_body" role="tab" aria-controls="#reports_body" aria-selected="false">گزارشات</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="details_body" role="tabpanel">
+                    {# TABLE OF PROJECT DETAILS #}
+                    {#                    <div class="card shadow">#}
+                    {#                        <div class="card-body px-3">#}
+                    <table class="table table-striped table-bordered text-center table-responsive-sm" dir="rtl">
+                        <tbody>
+                        <tr>
+                            <th>عنوان</th>
+                            <td>{{ project.title }}</td>
+                        </tr>
+                        <tr>
+                            <th>نوع قرارداد</th>
+                            <td>{{ project.contract_type }}</td>
+                        </tr>
+                        <tr>
+                            <th>محل عقد قرارداد</th>
+                            <td>{{ project.place_of_make_contract }}</td>
+                        </tr>
+                        <tr>
+                            <th>پیمانکار</th>
+                            <td>{{ project.contractor }}</td>
+                        </tr>
+                        <tr>
+                            <th>شماره قرارداد</th>
+                            <td>{{ project.contract_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>تاریخ قرارداد</th>
+                            <td>{{ project.contract_start_date }}</td>
+                        </tr>
+                        <tr>
+                            <th>مدت قرارداد (ماه)</th>
+                            <td>{{ project.contract_length }}</td>
+                        </tr>
+                        <tr>
+                            <th>مبلغ قرارداد (میلیون ریال)</th>
+                            <td>{{ project.contract_cost }}</td>
+                        </tr>
+                        <tr>
+                            <th>محل اجرای پروژه</th>
+                            <td>{{ project.place_of_project }}</td>
+                        </tr>
+                        <tr>
+                            <th>حجم قرارداد (کیلومتر)</th>
+                            <td>{{ project.contract_volume }}</td>
+                        </tr>
+                        <tr>
+                            <th>(درصد پیشرفت فیزیکی)</th>
+                            <td>{{ project.physical_progress }}</td>
+                        </tr>
+                        <tr>
+                            <th>درصد پیشرفت مالی</th>
+                            <td>{{ project.financial_progress }}</td>
+                        </tr>
+                        <tr>
+                            <th>مقدار سیم برکناری</th>
+                            <td>{{ project.recycled_conductor }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    {#                        </div>#}
+                    {#                    </div>#}
+                </div>
+                <div class="tab-pane fade" id="reports_body" role="tabpanel">
+                    {% for report in reports %}
+                        <div class="accordion" id="accordion{{ report.id }}">
+                            <div class="card col-6 col-sm-4 col-md-3">
+                                <div class="card-header text-center">
+                                    <h4 class="text-muted" data-toggle="collapse" data-target="#collapse{{ report.id }}">{{ report.date }}</h4>
+                                </div>
+                                <div class="collapse" id="collapse{{ report.id }}" data-parent="#accordion{{ report.id }}">
+                                    <div class="card-body text-center">
+                                        <h3>{{ report.title }}</h3>
+                                        <p class="text-muted">{{ report.date }}</p>
+                                        <h5>{{ report.report_type }}</h5>
+                                        <h2>% {{ report.physical_progress }}</h2>
+                                        <p>{{ report.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+</div>
+
+
+{# LOGOUT MODAL SECTION #}
+<div class="modal fade" id="logout-modal">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logout-modalLabel">خروج کاربر</h5>
+                <button class="close mr-auto ml-0 px-2 align-middle" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-right">آیا از خروج اطمینان دارید؟</p>
+            </div>
+            <div class="modal-footer">
+                <form method='POST' action="{% url 'logoutuser' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">خروج</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{# FOOTER SECTION #}
+<section id="footer" class="bg-dark" style="background-color: #082d12 !important;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col text-center">
+                <div class="py-2 text-white">
+                    <p class="mt-3">ستاد شرکت توزیع نیروی برق استان مرکزی</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script src="{% static 'src/js/jquery.min.js' %}"></script>
+<script src="{% static 'src/js/tether.min.js' %}"></script>
+<script src="{% static 'src/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'src/js/navbar-fixed.js' %}"></script>
+
+
+
+</body>
+</html>
+
